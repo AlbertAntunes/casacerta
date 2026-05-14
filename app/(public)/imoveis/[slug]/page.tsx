@@ -14,7 +14,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const imovel = await getImovelBySlug(params.slug)
+  const imovel = await getImovelBySlug(params.slug, true)
   if (!imovel) return { title: 'Imóvel não encontrado' }
 
   const preco = formatPreco(imovel.preco)
@@ -36,12 +36,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const { data } = await getImoveis({}, 1, 200)
+  const { data } = await getImoveis({}, 1, 200, true)
   return data.map((i) => ({ slug: i.slug }))
 }
 
 export default async function ImovelPage({ params }: Props) {
-  const imovel = await getImovelBySlug(params.slug)
+  const imovel = await getImovelBySlug(params.slug, true)
   if (!imovel) notFound()
 
   const imagens = [...(imovel.imovel_imagens ?? [])].sort(

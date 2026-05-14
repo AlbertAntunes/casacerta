@@ -73,6 +73,10 @@ create index idx_imoveis_ativo    on imoveis(ativo);
 create index idx_imoveis_slug     on imoveis(slug);
 create index idx_imagens_imovel   on imovel_imagens(imovel_id, ordem);
 
+-- ── Constraints ───────────────────────────────────────────────
+alter table imovel_imagens 
+add constraint unique_ordem_por_imovel unique(imovel_id, ordem);
+
 -- ================================================================
 -- ROW LEVEL SECURITY (RLS)
 -- ================================================================
@@ -99,13 +103,23 @@ create policy "publico_le_imagens"
 -- ADMIN: usuário autenticado tem controle total
 create policy "admin_full_imoveis"
   on imoveis for all
-  using (auth.role() = 'authenticated')
-  with check (auth.role() = 'authenticated');
+  using (auth.uid() = corretor_id)
+  with check (auth.uid() = corretor_id);
 
 create policy "admin_full_imagens"
   on imovel_imagens for all
-  using (auth.role() = 'authenticated')
-  with check (auth.role() = 'authenticated');
+  using (
+    exists (
+      select 1 from imoveis
+      where id = imovel_id and corretor_id = auth.uid()
+    )
+  )
+  with check (
+    exists (
+      select 1 from imoveis
+      where id = imovel_id and corretor_id = auth.uid()
+    )
+  );
 
 -- ================================================================
 -- STORAGE: bucket para imagens

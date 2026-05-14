@@ -1,6 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generateSlug } from '@/lib/utils'
+import { z } from 'zod'
+
+const createImovelSchema = z.object({
+  titulo: z.string().min(3).max(255),
+  descricao: z.string().optional(),
+  preco: z.number().positive(),
+  tipo: z.enum(['casa', 'apartamento', 'terreno', 'comercial']),
+  status: z.enum(['disponivel', 'vendido', 'alugado', 'reservado']).default('disponivel'),
+  cidade: z.string().min(1).default('Quixadá'),
+  bairro: z.string().optional(),
+  endereco: z.string().optional(),
+  quartos: z.number().int().min(0).optional(),
+  banheiros: z.number().int().min(0).optional(),
+  vagas: z.number().int().min(0).default(0),
+  area_m2: z.number().positive().optional(),
+  destaque: z.boolean().default(false),
+  slug: z.string().regex(/^[a-z0-9-]+$/, 'Slug deve conter apenas letras minúsculas, números e hífens').optional(),
+  ativo: z.boolean().default(true),
+})
 
 // GET /api/imoveis — listagem pública com filtros
 export async function GET(request: NextRequest) {
@@ -43,27 +62,41 @@ export async function POST(request: NextRequest) {
 
   const body = await request.json()
 
+  // Valida entrada
+  const validation = createImovelSchema.safeParse(body)
+  if (!validation.success) {
+    return NextResponse.json({ 
+      error: 'Dados inválidos', 
+      details: validation.error.issues 
+    }, { status: 400 })
+  }
+
+  const validatedData = validation.data
+
   // Garante slug único
-  if (!body.slug) {
-    body.slug = generateSlug(body.titulo)
+  if (!validatedData.slug) {
+    validatedData.slug = generateSlug(validatedData.titulo)
   }
 
   // Verifica se slug já existe
   const { data: existing } = await supabase
     .from('imoveis')
     .select('id')
-    .eq('slug', body.slug)
+    .eq('slug', validatedData.slug)
     .single()
 
   if (existing) {
-    body.slug = `${body.slug}-${Date.now()}`
+    validatedData.slug = `${validatedData.slug}-${Date.now()}`
   }
 
-  body.corretor_id = session.user.id
+  const insertData = {
+    ...validatedData,
+    corretor_id: session.user.id,
+  }
 
   const { data, error } = await supabase
     .from('imoveis')
-    .insert(body)
+    .insert(insertData)
     .select()
     .single()
 

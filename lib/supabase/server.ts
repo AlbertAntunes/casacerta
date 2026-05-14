@@ -12,20 +12,32 @@ export function createClient() {
         get(name: string) {
           return cookieStore.get(name)?.value
         },
-        set(name: string, value: string, options: Record<string, unknown>) {
+        set(name: string, value: string, options: Record<string, any>) {
           try {
             cookieStore.set({ name, value, ...options })
-          } catch {
-            // Server Component — ignorar
-          }
+          } catch {}
         },
-        remove(name: string, options: Record<string, unknown>) {
+        remove(name: string, options: Record<string, any>) {
           try {
             cookieStore.set({ name, value: '', ...options })
-          } catch {
-            // Server Component — ignorar
-          }
+          } catch {}
         },
+      },
+    }
+  )
+}
+
+export function createPublicClient() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get() {
+          return undefined
+        },
+        set() {},
+        remove() {},
       },
     }
   )

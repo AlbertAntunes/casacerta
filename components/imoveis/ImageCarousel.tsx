@@ -74,7 +74,7 @@ export function ImageCarousel({ imagens, titulo }: Props) {
             >
               <Image
                 src={img.url}
-                alt=""
+                alt={img.alt_text || `${titulo} - Imagem ${i + 1}`}
                 fill
                 className="object-cover"
                 sizes="64px"

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createPublicClient } from '@/lib/supabase/server'
 import type {
   Imovel,
   FiltrosImovel,
@@ -10,9 +10,10 @@ import type {
 export async function getImoveis(
   filtros: FiltrosImovel = {},
   page = 1,
-  perPage = 12
+  perPage = 12,
+  usePublicClient = false
 ): Promise<{ data: Imovel[]; total: number }> {
-  const supabase = createClient()
+  const supabase = usePublicClient ? createPublicClient() : createClient()
 
   let query = supabase
     .from('imoveis')
@@ -57,8 +58,11 @@ export async function getImoveisAdmin(): Promise<Imovel[]> {
 }
 
 // ── BUSCAR POR SLUG ───────────────────────────────────────────────────
-export async function getImovelBySlug(slug: string): Promise<Imovel | null> {
-  const supabase = createClient()
+export async function getImovelBySlug(
+  slug: string,
+  usePublicClient = false
+): Promise<Imovel | null> {
+  const supabase = usePublicClient ? createPublicClient() : createClient()
   const { data, error } = await supabase
     .from('imoveis')
     .select('*, imovel_imagens(*)')
@@ -73,7 +77,9 @@ export async function getImovelBySlug(slug: string): Promise<Imovel | null> {
     .from('imoveis')
     .update({ views: (data.views ?? 0) + 1 })
     .eq('id', data.id)
-    .then(() => {})
+    .then(({ error }) => {
+      if (error) console.error('Erro ao incrementar views:', error)
+    })
 
   return data as Imovel
 }

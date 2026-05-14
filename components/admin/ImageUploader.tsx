@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import type { ImovelImagem } from '@/types/imovel.types'
 import { deleteImagem } from '@/services/imagens.service'
+import { IMAGE_CONSTANTS } from '@/lib/constants'
 
 interface Props {
   imovelId?: string
@@ -26,13 +27,28 @@ export function ImageUploader({
     (files: FileList) => {
       const novos: { file: File; url: string }[] = []
       const validos: File[] = []
+      const erros: string[] = []
 
       Array.from(files).forEach((file) => {
-        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return
-        if (file.size > 5 * 1024 * 1024) return
+        // Valida tipo
+        if (!IMAGE_CONSTANTS.ALLOWED_TYPES.includes(file.type as any)) {
+          erros.push(`${file.name}: formato não permitido (apenas JPEG, PNG, WebP)`)
+          return
+        }
+
+        // Valida tamanho
+        if (file.size > IMAGE_CONSTANTS.MAX_SIZE_BYTES) {
+          erros.push(`${file.name}: arquivo muito grande (máximo ${IMAGE_CONSTANTS.MAX_SIZE_MB}MB)`)
+          return
+        }
+
         novos.push({ file, url: URL.createObjectURL(file) })
         validos.push(file)
       })
+
+      if (erros.length > 0) {
+        alert(`Erros ao adicionar imagens:\n${erros.join('\n')}`)
+      }
 
       setPreviews((p) => [...p, ...novos])
       onFilesQueued(validos)
@@ -55,8 +71,12 @@ export function ImageUploader({
     try {
       await deleteImagem(img)
       onImagensChange(imagens.filter((i) => i.id !== img.id))
-    } catch {
-      alert('Erro ao remover imagem.')
+    } catch (error) {
+      const mensagem = error instanceof Error 
+        ? error.message 
+        : 'Erro desconhecido ao remover imagem.'
+      alert(`Erro ao remover imagem: ${mensagem}`)
+      console.error('Erro ao remover imagem:', error)
     } finally {
       setDeletando(null)
     }
@@ -93,7 +113,7 @@ export function ImageUploader({
           Arraste imagens aqui ou clique para selecionar
         </p>
         <p className="text-green-600 text-sm mt-1">
-          JPG, PNG ou WebP · Máximo 5MB por imagem
+          {IMAGE_CONSTANTS.ALLOWED_EXTENSIONS.map(e => e.toUpperCase()).join(', ')} · Máximo {IMAGE_CONSTANTS.MAX_SIZE_MB}MB por imagem
         </p>
         {totalImagens > 0 && (
           <p className="text-green-400 text-sm mt-2 font-bold">
