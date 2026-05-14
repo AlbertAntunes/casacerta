@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🏠 Casa Certa Imóveis — Plataforma Profissional
 
 > Next.js 14 · TypeScript · Tailwind CSS · Supabase · Vercel
@@ -307,3 +308,6 @@ Em caso de dúvidas técnicas, verifique a documentação oficial:
 - [Next.js Docs](https://nextjs.org/docs)
 - [Supabase Docs](https://supabase.com/docs)
 - [Vercel Docs](https://vercel.com/docs)
+=======
+# casacerta
+>>>>>>> 4df122582bec6e3f1a9b8a31548ffda0e877eaa1
