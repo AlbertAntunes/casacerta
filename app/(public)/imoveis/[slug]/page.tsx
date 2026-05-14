@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { getImovelBySlug, getImoveis } from '@/services/imoveis.service'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'

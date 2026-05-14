@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic'
 import { getImoveis } from '@/services/imoveis.service'
 import { ImovelCard } from '@/components/imoveis/ImovelCard'
 import { FilterBar } from '@/components/imoveis/FilterBar'
