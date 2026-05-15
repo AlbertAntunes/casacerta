@@ -59,7 +59,7 @@ export function Navbar() {
           {['Início', 'Imóveis', 'Sobre', 'Contato'].map((item) => (
             <Link
               key={item}
-              href={`#${item.toLowerCase()}`}
+              href={`${item.toLowerCase()}`}
               className="btn btn-ghost btn-sm text-sm"
             >
               {item}
