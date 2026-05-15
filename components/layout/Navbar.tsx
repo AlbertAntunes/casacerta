@@ -1,121 +1,104 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { cn } from '@/lib/utils'
-
-const links = [
-  { href: '/#imoveis', label: 'Imóveis' },
-  { href: '/#destaques', label: 'Destaques' },
-  { href: '/#equipe', label: 'Equipe' },
-  { href: '/imoveis', label: 'Todos' },
-]
+import { Button } from '@/components/ui/Button'
 
 export function Navbar() {
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [scrolled, setScrolled] = useState(false)
-  const [open, setOpen] = useState(false)
-  const pathname = usePathname()
 
+  // Persistir tema
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
+    const saved = localStorage.getItem('theme') as 'dark' | 'light' | null
+    if (saved) applyTheme(saved)
   }, [])
 
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  function applyTheme(t: 'dark' | 'light') {
+    document.documentElement.setAttribute('data-theme', t)
+    localStorage.setItem('theme', t)
+    setTheme(t)
+  }
+
+  function toggleTheme() {
+    applyTheme(theme === 'dark' ? 'light' : 'dark')
+  }
+
   return (
-    <>
-      <header
-        className={cn(
-          'fixed top-0 inset-x-0 z-50 transition-all duration-300',
-          scrolled
-            ? 'bg-green-950/90 backdrop-blur-xl border-b border-green-800/40 shadow-lg'
-            : 'bg-transparent'
-        )}
-      >
-        <div className="container flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-2xl">🏠</span>
-            <span className="font-serif font-black text-green-400 text-lg leading-none">
-              Casa<br />
-              <span className="text-green-100">Certa</span>
-            </span>
-          </Link>
-
-          {/* Links desktop */}
-          <nav className="hidden md:flex items-center gap-8">
-            {links.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={cn(
-                  'text-sm font-semibold transition relative pb-0.5',
-                  'after:absolute after:bottom-0 after:left-0 after:h-0.5',
-                  'after:bg-green-400 after:transition-all after:duration-300',
-                  pathname === l.href
-                    ? 'text-green-400 after:w-full'
-                    : 'text-green-300 hover:text-green-400 after:w-0 hover:after:w-full'
-                )}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="hidden md:flex items-center gap-3">
-            <a
-              href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_DIOGO}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary py-2 px-5 text-sm"
-            >
-              💬 WhatsApp
-            </a>
-          </div>
-
-          {/* Hamburger */}
-          <button
-            className="md:hidden p-2 rounded-lg bg-green-900/50 border border-green-700/30"
-            onClick={() => setOpen(!open)}
-            aria-label="Menu"
+    <header
+      className="navbar"
+      style={{
+        boxShadow: scrolled ? 'var(--shadow-md)' : 'none',
+        borderBottomColor: scrolled ? 'var(--border-hover)' : 'var(--border)',
+      }}
+    >
+      <div className="navbar-inner">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-content-center text-lg font-bold"
+            style={{ background: 'linear-gradient(135deg, var(--green), var(--green-700))' }}
           >
-            <div className={cn('w-5 h-0.5 bg-green-300 transition-all', open && 'rotate-45 translate-y-1.5')} />
-            <div className={cn('w-5 h-0.5 bg-green-300 my-1 transition-all', open && 'opacity-0')} />
-            <div className={cn('w-5 h-0.5 bg-green-300 transition-all', open && '-rotate-45 -translate-y-1.5')} />
-          </button>
-        </div>
-      </header>
+            🏠
+          </div>
+          <span
+            className="font-display font-black text-base tracking-tight"
+            style={{ color: 'var(--text)' }}
+          >
+            Casa<span style={{ color: 'var(--green)' }}>Certa</span>
+          </span>
+        </Link>
 
-      {/* Mobile menu */}
-      <div
-        className={cn(
-          'fixed inset-x-0 top-16 z-40 md:hidden transition-all duration-300',
-          'bg-green-950/95 backdrop-blur-xl border-b border-green-800/40',
-          open ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none'
-        )}
-      >
-        <nav className="container py-6 flex flex-col gap-2">
-          {links.map((l) => (
+        {/* Nav links — desktop */}
+        <nav className="hidden md:flex items-center gap-1">
+          {['Início', 'Imóveis', 'Sobre', 'Contato'].map((item) => (
             <Link
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              className="px-4 py-3 rounded-xl text-green-300 font-semibold hover:bg-green-900 hover:text-green-400 transition"
+              key={item}
+              href={`#${item.toLowerCase()}`}
+              className="btn btn-ghost btn-sm text-sm"
             >
-              {l.label}
+              {item}
             </Link>
           ))}
-          <a
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_DIOGO}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary justify-center mt-2"
+        </nav>
+
+        {/* Ações */}
+        <div className="flex items-center gap-3">
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            aria-label="Alternar tema"
+            className="w-12 h-6 rounded-full relative transition-all duration-300"
+            style={{
+              background: theme === 'dark' ? 'var(--bg3)' : 'var(--green)',
+              border: '1px solid var(--border)',
+            }}
+          >
+            <span
+              className="absolute top-0.5 w-5 h-5 rounded-full text-xs flex items-center justify-center transition-all duration-300"
+              style={{
+                background: theme === 'dark' ? 'var(--green)' : '#fff',
+                left: theme === 'dark' ? '2px' : '22px',
+              }}
+            >
+              {theme === 'dark' ? '🌙' : '☀️'}
+            </span>
+          </button>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => window.open('https://wa.me/5585999999999', '_blank')}
           >
             💬 WhatsApp
-          </a>
-        </nav>
+          </Button>
+        </div>
       </div>
-    </>
+    </header>
   )
 }

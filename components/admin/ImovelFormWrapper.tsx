@@ -91,12 +91,20 @@ export function ImovelFormWrapper({ imovel }: Props) {
       const method = imovel ? 'PUT' : 'POST'
 
       const payload = {
-        ...data,
-        quartos: data.quartos === '' ? null : data.quartos,
-        banheiros: data.banheiros === '' ? null : data.banheiros,
-        area_m2: data.area_m2 === '' ? null : data.area_m2,
-      }
-
+      ...data,
+      // ✅ Converte strings para números antes de enviar
+      preco: Number(data.preco),
+      vagas: Number(data.vagas),
+      quartos: data.quartos === '' || data.quartos == null
+        ? null
+        : Number(data.quartos),
+      banheiros: data.banheiros === '' || data.banheiros == null
+        ? null
+        : Number(data.banheiros),
+      area_m2: data.area_m2 === '' || data.area_m2 == null
+        ? null
+        : Number(data.area_m2),
+    }
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
