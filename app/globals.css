@@ -221,3 +221,128 @@ button { cursor: pointer; border: none; outline: none; background: none; font-fa
 }
 .scroll-progress-fill { height: 100%; width: 100%; background: transparent; }
 
+/* ===================== COOKIE BANNER (SPEC) ===================== */
+#cookieBanner {
+  position: fixed;
+  color-scheme: dark;
+
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6000;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  box-shadow: var(--sh2);
+  max-width: 560px;
+  width: calc(100% - 32px);
+  animation: slideUpIn .5s ease forwards;
+}
+
+@keyframes slideUpIn {
+  from { opacity:0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity:1; transform: translateX(-50%) translateY(0); }
+}
+
+.cookie-privacy-link {
+  color: var(--g400);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.cookie-actions {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.cookie-accept {
+  background: var(--g400);
+  color: #fff;
+  border-radius: 99px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cookie-decline {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border2);
+  border-radius: 99px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ===================== NAVBAR (SPEC) ===================== */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 70px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  transition: all .32s cubic-bezier(.4,0,.2,1);
+}
+
+.navbar .navbar-inner {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.navbar.scrolled {
+  background: rgba(7,13,9,.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 24px rgba(0,0,0,.3);
+  height: 60px;
+}
+
+[data-theme="light"] .navbar.scrolled {
+  background: rgba(240,255,245,.88);
+}
+
+.nav-link {
+  position: relative;
+  padding: 9px 0;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .3px;
+  text-decoration: none;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--g400);
+  transition: width .25s;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+
+

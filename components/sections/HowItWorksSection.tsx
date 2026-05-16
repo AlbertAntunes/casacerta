@@ -15,7 +15,7 @@ export function HowItWorksSection() {
   ]
 
   return (
-    <section id="processo" className="py-24">
+    <section id="como" className="py-24">
       <div className="container">
         <div className="text-center mb-14">
           <div className="section-label justify-center">Nosso Processo</div>

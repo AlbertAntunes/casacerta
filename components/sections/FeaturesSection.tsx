@@ -15,7 +15,7 @@ export function FeaturesSection() {
   ]
 
   return (
-    <section id="vantagens" className="py-24 bg-[#08110b]">
+      <section id="diferenciais" className="py-24 bg-[#08110b]">
       <div className="container">
         <div className="text-center mb-14">
           <div className="section-label justify-center">Diferenciais</div>

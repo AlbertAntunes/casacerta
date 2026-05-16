@@ -6,9 +6,36 @@ import { Button } from '@/components/ui/Button'
 export function Navbar() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [scrolled, setScrolled] = useState(false)
+  const [activeId, setActiveId] = useState<string>('imoveis')
+
+  // IntersectionObserver (active link)
+  useEffect(() => {
+    const anchorIds = ['imoveis', 'equipe', 'como', 'diferenciais', 'depoimentos', 'faq'] as const
+
+    const observer = new IntersectionObserver(
+
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0]
+        if (visible?.target?.id) setActiveId(visible.target.id)
+      },
+      { threshold: 0.25 }
+    )
+
+    const targets = anchorIds
+      .map((id) => document.getElementById(id))
+      .filter(Boolean) as HTMLElement[]
+
+    targets.forEach((t) => observer.observe(t))
+    return () => observer.disconnect()
+  }, [])
 
   // Persistir tema
+
+
   useEffect(() => {
+
     const saved = localStorage.getItem('theme') as 'dark' | 'light' | null
     if (saved) applyTheme(saved)
   }, [])
@@ -30,13 +57,7 @@ export function Navbar() {
   }
 
   return (
-    <header
-      className="navbar"
-      style={{
-        boxShadow: scrolled ? 'var(--shadow-md)' : 'none',
-        borderBottomColor: scrolled ? 'var(--border-hover)' : 'var(--border)',
-      }}
-    >
+    <header className={scrolled ? 'navbar scrolled' : 'navbar'}>
       <div className="navbar-inner">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
@@ -55,17 +76,29 @@ export function Navbar() {
         </Link>
 
         {/* Nav links — desktop */}
-        <nav className="hidden md:flex items-center gap-1">
-          {['Início', 'Imóveis', 'Sobre', 'Contato'].map((item) => (
+        <nav className="hidden md:flex items-center gap-6 text-sm relative">
+          {[
+            { id: 'imoveis', label: 'Imóveis' },
+            { id: 'equipe', label: 'Equipe' },
+            { id: 'como', label: 'Como' },
+            { id: 'diferenciais', label: 'Diferenciais' },
+            { id: 'depoimentos', label: 'Depoimentos' },
+            { id: 'faq', label: 'FAQ' },
+          ].map((item) => (
             <Link
-              key={item}
-              href={`${item.toLowerCase()}`}
-              className="btn btn-ghost btn-sm text-sm"
+              key={item.id}
+              href={`/#${item.id}`}
+              className={`nav-link btn btn-ghost btn-sm text-sm relative ${activeId === item.id ? 'active' : ''}`}
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }}
             >
-              {item}
+              {item.label}
             </Link>
           ))}
         </nav>
+
 
         {/* Ações */}
         <div className="flex items-center gap-3">

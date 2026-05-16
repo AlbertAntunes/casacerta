@@ -7,7 +7,7 @@ export function StatsSection() {
   ]
 
   return (
-    <section id="resultados" className="py-24 bg-[#090f0b]">
+      <section id="diferenciais" className="py-24 bg-[#090f0b]">
       <div className="container">
         <div className="text-center mb-16">
           <div className="section-label justify-center">Resultados</div>
